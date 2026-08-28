@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colour Sequence</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 30px;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      max-width: 400px;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 18px;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    #screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: black;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="setup">
+    <input id="sequence" type="text" placeholder="Input sequence">
+    <button onclick="playSequence()">Play Sequence</button>
+  </div>
+
+  <div id="screen"></div>
+
+  <script>
+    const colours = {
+      R: "#FF0000",
+      G: "#00FF00",
+      Y: "#FFFF00",
+      B: "#0000FF",
+      W: "#FFFFFF",
+      V: "#8F00FF"
+    };
+
+    const colourTime = 1000;
+    const blinkTime = 90;
+
+    function playSequence() {
+      const sequenceInput = document.getElementById("sequence");
+      const sequence = sequenceInput.value.toUpperCase().replace(/\s/g, "");
+
+      if (!sequence || !sequence.split("").every(c => colours[c])) {
+        alert("Use only R, G, Y, B, W, V");
+        return;
+      }
+
+      const setupDiv = document.getElementById("setup");
+      const screen = document.getElementById("screen");
+
+      // Hide setup and show screen
+      setupDiv.style.display = "none";
+      screen.style.display = "block";
+      
+      // Ensure the screen is black during the initial 5-second wait
+      screen.style.background = "black";
+
+      let i = 0;
+
+      function showColour() {
+        if (i >= sequence.length) {
+          resetUI();
+          return;
+        }
+
+        // Show current colour
+        screen.style.background = colours[sequence[i]];
+
+        setTimeout(() => {
+          // If there is another frame coming up, do the blink
+          if (i < sequence.length - 1) {
+            screen.style.background = "black";
+            
+            setTimeout(() => {
+              i++;
+              showColour();
+            }, blinkTime);
+            
+          } else {
+            // If it's the last frame, go back to the setup screen
+            resetUI();
+          }
+
+        }, colourTime);
+      }
+
+      // Helper function to reset the interface
+      function resetUI() {
+        screen.style.display = "none";
+        setupDiv.style.display = "block";
+        sequenceInput.value = ""; // Clears the input field for the next sequence
+      }
+
+      // Start the 5-second delay before playing the sequence
+      setTimeout(() => {
+        showColour();
+      }, 5000);
+    }
+  </script>
+
+</body>
+</html>
